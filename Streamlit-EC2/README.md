@@ -1,98 +1,50 @@
-# Streamlit Application Deployment on Amazon EC2
+Deploying a Streamlit App in Docker on AWS EC2 📌 Overview This guide provides a step-by-step approach to deploying a Streamlit app inside a Docker container on an AWS EC2 instance with a custom network setup. It covers:
 
-## Access the Streamlit application at:
-https://docknest-fazewmfro2peqhq3bahmrc.streamlit.app/
-<img width="959" alt="image" src="https://github.com/user-attachments/assets/220930d5-5204-43a0-ac57-364707672f71" />
+✅ Setting up a VPC, Subnet, Route Table, and Internet Gateway ✅ Launching and configuring an EC2 instance ✅ Installing and configuring Docker ✅ Transferring project files to EC2 ✅ Running the Streamlit app inside a Docker container ✅ Managing the Docker container
 
+📖 Table of Contents- 1️⃣ Setting Up a VPC, Subnet, Route Table, and Internet Gateway 2️⃣ Launching and Configuring an EC2 Instance 3️⃣ Connecting to EC2 4️⃣ Setting Permissions for the PEM Key 5️⃣ Installing and Configuring Docker 6️⃣ Copying Project Files to EC2 7️⃣ Building and Running the Docker Container 8️⃣ Accessing the Streamlit App 9️⃣ Managing the Docker Container
 
-## 📌 Introduction
-This project demonstrates how to deploy a **Streamlit** application on an **Amazon EC2** instance. Streamlit is a powerful Python framework for building interactive web applications with minimal effort. By hosting it on EC2, we make the application accessible over the internet with a public IP or domain name.
+1️⃣ Setting Up a VPC, Subnet, Route Table, and Internet Gateway 🔹 Create a New VPC Go to AWS Console → VPC Dashboard → Create VPC
 
----
-## 🚀 Features
-- Deploy a **Streamlit** web application on an **AWS EC2 instance**
-- Use **Ubuntu** as the OS for the EC2 instance
-- Configure security groups to allow web traffic
-- Run the app as a background service using **nohup** or **screen**
-- Map a custom domain with **NGINX (optional)**
+Name: MyCustomVPC IPv4 CIDR block: 10.0.0.0/16 image
 
----
-## 🛠 Prerequisites
-Before proceeding, ensure you have the following:
-- An **AWS** account
-- A **Streamlit** application ready for deployment
-- Basic knowledge of **Linux commands** and **SSH**
+🔹 Create a Subnet Go to VPC Dashboard → Subnets → Create Subnet
 
----
-## 📦 Setup Guide
-### 1️⃣ Launch an EC2 Instance
-1. Log in to **AWS Console**.
-2. Go to **EC2 Dashboard** → Click **Launch Instance**.
-3. Choose an **Ubuntu** AMI (e.g., `Ubuntu 22.04 LTS`).
-4. Select an instance type (e.g., `t2.micro` for free-tier usage).
-5. Configure Security Group:
-   - Allow **SSH (22)** from your IP.
-   - Allow **HTTP (80)** and **HTTPS (443)** from anywhere.
-6. Add a key pair for SSH access.
-7. Launch the instance and note down its **public IP**.
+Select: MyCustomVPC Subnet name: MyPublicSubnet CIDR block: 10.0.1.0/24 Enable Auto-assign Public IPv4 image
 
-### 2️⃣ Connect to the Instance via SSH
-```sh
-ssh -i your-key.pem ubuntu@your-ec2-public-ip
-```
+🔹 Create an Internet Gateway and Attach to VPC Name: MyIGW Attach it to: MyCustomVPC
 
-### 3️⃣ Install Required Packages
-```sh
-sudo apt update && sudo apt upgrade -y
-sudo apt install python3-pip -y
-```
+image
+🔹 Create and Associate a Route Table Name: MyPublicRouteTable Destination: 0.0.0.0/0 Target: MyIGW Associate with: MyPublicSubnet image
 
-### 4️⃣ Clone Your Streamlit App Repository
-```sh
-git clone https://github.com/your-username/your-streamlit-repo.git
-cd your-streamlit-repo
-```
+2️⃣ Launching and Configuring an EC2 Instance 🔹 Launch an EC2 Instance Name: Streamlit-EC2 AMI: Amazon Linux 2023 Instance Type: t2.micro (Free Tier) Key Pair: Select/Create a key pair Network: MyCustomVPC Subnet: MyPublicSubnet Enable Auto-assign Public IP Security Group: Allow SSH (22), HTTP (80), Streamlit (8501) image
 
-### 5️⃣ Install Dependencies
-```sh
-pip install -r requirements.txt
-```
+3️⃣ Connecting to EC2 🔹 Via EC2 Instance Connect Go to EC2 Dashboard → Select Instance → Click Connect
 
-### 6️⃣ Run Streamlit App
-```sh
-streamlit run app.py --server.port 8501 --server.address 0.0.0.0
-```
-The app will now be accessible at `http://your-ec2-public-ip:8501`.
+Choose: EC2 Instance Connect Click: Connect image
 
----
-## 🌍 Making It Publicly Accessible
-### 1️⃣ Open Firewall for Streamlit (Port 8501)
-```sh
-sudo ufw allow 8501
-```
-### 2️⃣ Run Streamlit in the Background (Optional)
-```sh
-nohup streamlit run app.py --server.port 8501 --server.address 0.0.0.0 &
-```
-This allows the app to keep running even after logging out.
+4️⃣ Setting Permissions for the PEM Key mv /path/to/your-key.pem ~/your-work-directory/ chmod 600 your-key.pem 5️⃣ Installing and Configuring Docker sudo yum update -y sudo yum install -y docker sudo systemctl enable docker sudo systemctl start docker image
 
----
-## Use Render for deploying your application.
-![Screenshot 2025-03-25 144037](https://github.com/user-attachments/assets/42b10b1b-f13b-4df2-99fc-2388a10b69d7)
-![Screenshot 2025-03-25 144049](https://github.com/user-attachments/assets/8c786bee-2f4c-4fe1-8637-0ddc4691ed08)
-Access it on
-https://docknest-2.onrender.com/
-![image](https://github.com/user-attachments/assets/fb15b66f-4d2e-438a-828b-55851572d8b5)
+6️⃣ Copying Project Files to EC2 scp -i your-key.pem app.py Dockerfile requirements.txt mushrooms.csv ec2-user@your-ec2-public-ip:/home/ec2-user/ image
 
+7️⃣ Building and Running the Docker Container 🔹 Connect to EC2 and navigate to project directory cd /home/ec2-user 🔹 Build the Docker image sudo docker build -t streamlit-app . image
 
+🔹 Run the container sudo docker run -d -p 8501:8501 --name streamlit_container streamlit-app image
 
-## 📜 License
-This project is open-source under the **MIT License**.
+8️⃣ Accessing the Streamlit App 🌐 Open your browser and visit:
 
----
+http://your-ec2-public-ip:8501 image
 
-## 📬 Contact
-For any questions or issues, feel free to reach out:
-- **GitHub**: [your-username](https://github.com/your-username)
-- **Email**: your-email@example.com
+9️⃣ Managing the Docker Container
 
+🔹 Check running containers
+
+sudo docker ps 🔹 Stop the container
+
+sudo docker stop streamlit_container 🔹 Remove the container
+
+sudo docker rm streamlit_container 🔹 Restart the container
+
+sudo docker start streamlit_container 🎯 Conclusion This guide helps you deploy a Streamlit app inside a Docker container on AWS EC2 with a custom VPC setup. The deployment ensures scalability, security, and high availability for your application. 🚀🎉
+
+✅ Happy Deploying! 🖥️🐳☁️ steps to do this
