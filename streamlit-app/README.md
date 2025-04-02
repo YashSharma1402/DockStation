@@ -4,7 +4,7 @@
 ## Access the application at
 https://docknest-ypsrcfmkvjokuc2dnmpcm8.streamlit.app/
 <img width="959" alt="image" src="https://github.com/user-attachments/assets/fe85095f-5468-4f6b-bfb9-ca26aec48a66" />
-![image](https://github.com/user-attachments/assets/314de6a7-3ec1-4fdc-bbc5-c05d458743b8)
+
 
 
 
@@ -192,13 +192,7 @@ This project is open-source.**.
 
 💡 **Happy Coding! 🚀🎉**
 
-## Deploying it on Render
-![Screenshot 2025-03-25 114157](https://github.com/user-attachments/assets/9ba561a9-c8f4-4acf-902b-a575cfaa6aac)
-![Screenshot 2025-03-25 114209](https://github.com/user-attachments/assets/5198de96-0d52-4ad4-9283-751321d5fc33)
-![Screenshot 2025-03-25 114222](https://github.com/user-attachments/assets/0c57de24-5602-4c30-9cea-aa47c0244ac2)
-You can view your app at
-https://docknest-1.onrender.com/
-![image](https://github.com/user-attachments/assets/28593609-ddb7-4fd3-8af7-6a7e4620e0ec)
+
 
 
 
