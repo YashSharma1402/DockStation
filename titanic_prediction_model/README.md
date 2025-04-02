@@ -1,6 +1,6 @@
 #  **Titanic Survival Predictor:- Containerized Streamlit App**
 Access the app at-
-https://docknest-jm7n5epjlpfny7jveon7xs.streamlit.app/
+https://dockstation-nuaxvofk77zcggdsixfzwk.streamlit.app/
 ![image](https://github.com/user-attachments/assets/fc616e83-1589-4cbe-90ed-1be035d354b4)
 
 ##  **Overview**
