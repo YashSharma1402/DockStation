@@ -2,7 +2,7 @@
 # 🚀 Streamlit Spiral Visualization App with Docker
 
 ## Access the application at
-https://docknest-ypsrcfmkvjokuc2dnmpcm8.streamlit.app/
+https://dockstation-zgddkv5rsyqhkgq2l6d6mq.streamlit.app/
 <img width="959" alt="image" src="https://github.com/user-attachments/assets/fe85095f-5468-4f6b-bfb9-ca26aec48a66" />
 
 
