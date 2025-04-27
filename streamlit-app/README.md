@@ -1,18 +1,14 @@
 
 # 🚀 Streamlit Spiral Visualization App with Docker
 
-## Access the application at
-https://docknest-ypsrcfmkvjokuc2dnmpcm8.streamlit.app/
-<img width="959" alt="image" src="https://github.com/user-attachments/assets/fe85095f-5468-4f6b-bfb9-ca26aec48a66" />
-![image](https://github.com/user-attachments/assets/314de6a7-3ec1-4fdc-bbc5-c05d458743b8)
-
-
 
 Welcome to the **Streamlit Spiral Visualization App!** This project is a simple and interactive Python application built with **Streamlit** to visualize a **dynamic spiral.** You can customize the spiral’s characteristics using sliders and see real-time changes.
 
 The app is **Dockerized** for easy deployment and environment consistency.
 
 ---
+![Uploading image.png…]()
+
 
 ## 🌟 Features
 
@@ -45,10 +41,7 @@ Before running the application, make sure you have:
 ## 🛠 Getting Started
 
 ### **Step 1: Clone the Repository**
-```bash
-git clone https://github.com/ritu-pixel/DockNest.git
-cd DockNest/streamlit-app
-```
+
 
 ### **Step 2: Install Dependencies (Optional for Local Execution)**
 If you’re running locally without Docker, install the required packages:
@@ -64,11 +57,16 @@ After building, verify the image with:
 ```bash
 docker images
 ```
+<img width="1148" alt="image" src="https://github.com/user-attachments/assets/9f9fc2cd-f951-4129-aa49-7be7cddb4fc3" />
+
 
 ### **Step 4: Run the Docker Container**
 ```bash
 docker run -p 8501:8501 streamlit-app
 ```
+
+<img width="779" alt="image" src="https://github.com/user-attachments/assets/9570d4e0-ac92-47b8-93f4-4b7c9c934c79" />
+
 
 ### **Step 5: Access the Application**
 Once the container is running, open your browser and visit:
@@ -131,6 +129,8 @@ st.altair_chart(chart, use_container_width=True)
 ```
 
 ---
+<img width="972" alt="image" src="https://github.com/user-attachments/assets/d151adcf-6a24-475a-b9c5-af0177f53935" />
+
 
 ## 🐳 Dockerfile
 
@@ -158,6 +158,9 @@ CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0
 ```
 
 ---
+<img width="965" alt="image" src="https://github.com/user-attachments/assets/fcc94e7b-9691-440c-a557-0fa10beb7497" />
+
+
 
 ## 🛠 Troubleshooting
 
@@ -192,13 +195,7 @@ This project is open-source.**.
 
 💡 **Happy Coding! 🚀🎉**
 
-## Deploying it on Render
-![Screenshot 2025-03-25 114157](https://github.com/user-attachments/assets/9ba561a9-c8f4-4acf-902b-a575cfaa6aac)
-![Screenshot 2025-03-25 114209](https://github.com/user-attachments/assets/5198de96-0d52-4ad4-9283-751321d5fc33)
-![Screenshot 2025-03-25 114222](https://github.com/user-attachments/assets/0c57de24-5602-4c30-9cea-aa47c0244ac2)
-You can view your app at
-https://docknest-1.onrender.com/
-![image](https://github.com/user-attachments/assets/28593609-ddb7-4fd3-8af7-6a7e4620e0ec)
+
 
 
 
