@@ -35,6 +35,7 @@ Preprocess missing values and encode categorical features
 Train the Random Forest model
 
 Save the trained model as titanic_model.pkl
+
 <img width="625" alt="image" src="https://github.com/user-attachments/assets/5f90c1e1-6f7a-42ce-865a-1bd39c0464e2" />
 <img width="833" alt="image" src="https://github.com/user-attachments/assets/d2c15410-db4d-43ad-acb6-0d1231f4b684" />
 
@@ -51,6 +52,7 @@ The Streamlit app provides a clean and interactive interface for users to input 
 ✔️ Interactive sliders and dropdowns for input selection
 
 ✔️ Dark mode compatible
+
 <img width="583" alt="image" src="https://github.com/user-attachments/assets/c495686e-0e91-4c7c-946d-ad081086817e" />
 <img width="653" alt="image" src="https://github.com/user-attachments/assets/a0fe6ef2-1d7d-4a2b-a87b-e37eb946efc5" />
 
@@ -79,6 +81,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the application port
 EXPOSE 8501
+
 <img width="630" alt="image" src="https://github.com/user-attachments/assets/334b0717-9b68-49d1-9b63-8e86a306a5c5" />
 <img width="804" alt="image" src="https://github.com/user-attachments/assets/739d669e-d632-4dbc-9bee-3c216e8b550c" />
 
@@ -105,12 +108,15 @@ Edit
 docker run -p 8501:8501 titanic-prediction
 4️⃣ Access the Application
 Open your browser and navigate to:
+
 <img width="1103" alt="image" src="https://github.com/user-attachments/assets/fb569603-7f01-475f-898c-b6fc05e3d315" />
 <img width="1090" alt="image" src="https://github.com/user-attachments/assets/868fb6e6-ecf7-4cfe-b25c-aa8281fd8c9d" />
 
 
 
 👉 http://localhost:8502
+<img width="1381" alt="image" src="https://github.com/user-attachments/assets/a110fb8c-d11d-4537-9caa-727481ae023c" />
+
 
 🎯 Conclusion
 This project demonstrates the deployment of a Machine Learning model using Streamlit and Docker.
