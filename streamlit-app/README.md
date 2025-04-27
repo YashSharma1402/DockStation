@@ -91,73 +91,13 @@ Once the container is running, open your browser and visit:
 ## 📜 Code Overview
 
 ### **Python Code (`app.py`)**
-```python
-import streamlit as st
-import pandas as pd
-import numpy as np
-import altair as alt
-from collections import namedtuple
 
-# Define a namedtuple for storing spiral points
-Point = namedtuple('Point', ['x', 'y'])
-
-# Function to generate spiral data
-def generate_spiral(num_points, num_turns):
-    data = []
-    for i in range(num_points):
-        angle = 2 * np.pi * num_turns * (i / num_points)
-        radius = i / num_points
-        x = radius * np.cos(angle)
-        y = radius * np.sin(angle)
-        data.append(Point(x, y))
-    return data
-
-# Streamlit App Layout
-st.title("🌀 Interactive Spiral Visualization")
-
-# User input sliders
-num_points = st.slider('Number of Points in Spiral', min_value=50, max_value=1000, value=500)
-num_turns = st.slider('Number of Turns in Spiral', min_value=1, max_value=10, value=5)
-
-# Generate and visualize spiral
-spiral_data = generate_spiral(num_points, num_turns)
-spiral_df = pd.DataFrame(spiral_data, columns=['x', 'y'])
-
-# Create and display Altair chart
-chart = alt.Chart(spiral_df).mark_circle(size=3).encode(x='x', y='y').properties(width=600, height=600)
-st.altair_chart(chart, use_container_width=True)
-```
-
----
 <img width="972" alt="image" src="https://github.com/user-attachments/assets/d151adcf-6a24-475a-b9c5-af0177f53935" />
 
 
 ## 🐳 Dockerfile
 
-```dockerfile
-# Use official Python image
-FROM python:3.9-slim
 
-# Set the working directory
-WORKDIR /app
-
-# Copy dependencies
-COPY requirements.txt .
-
-# Install dependencies
-RUN pip install -r requirements.txt
-
-# Copy the app code
-COPY . .
-
-# Expose Streamlit port
-EXPOSE 8501
-
-# Run Streamlit app
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
-```
-
----
 <img width="965" alt="image" src="https://github.com/user-attachments/assets/fcc94e7b-9691-440c-a557-0fa10beb7497" />
 
 
