@@ -26,26 +26,21 @@ https://github.com/YashSharma1402/DockStation/tree/main/Docker%20Bake
 
 - [Minikube Microservices](https://github.com/YashSharma1402/DockStation/tree/main/Minikube%20MicroServices)
 
-- [Containerized SQL](./Containerized-sql)  
+- [Containerized SQL](https://github.com/YashSharma1402/DockStation/tree/main/Containerized%20MySQL)  
   🛢 Dockerizing a SQL database server for lightweight deployments.
 
-   [Python Logging in Docker](./Python-logging-Docker)  
+   [Python Logging in Docker](https://github.com/YashSharma1402/DockStation/tree/main/Python%20Logging%20Application%20with%20Docker)  
   🐍 Setting up structured Python logging inside Docker containers.
 
-- [Streamlit on EC2](./Streamlit-EC2)  
+- [Streamlit on EC2](https://github.com/YashSharma1402/DockStation/tree/main/Deploying%20a%20Streamlit%20App%20in%20Docker%20on%20AWS%20EC2)  
   🖥 Hosting Streamlit applications on AWS EC2 instances.
 
-- [Streamlit Hello World](./Streamlit_Hello-world)  
+- [Streamlit Hello World](https://github.com/YashSharma1402/DockStation/tree/main/DOCKER_BASICS)  
   🌍 Basic Streamlit app — your first "Hello, World!" project.
 
-- [Streamlit App (Evidently AI Dashboard)](./streamlit-app)  
-  📈 Streamlit frontend for real-time ML model monitoring using Evidently AI.
-
-- [Titanic Prediction Model](./titanic_prediction_model)  
+- [Titanic Prediction Model](https://github.com/YashSharma1402/DockStation/tree/main/Titanic-Prediction-Model)  
   🚢 Machine learning model predicting Titanic survival rates.
   
--[Streamlit Interactive App](./Streamlit-2)
-  Interactive App
 
 ---
 > ⭐ Feel free to explore each project folder for detailed README, Dockerfiles, app code, and deployment instructions!
