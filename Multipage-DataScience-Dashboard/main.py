@@ -2,388 +2,272 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import shap
-from sklearn.datasets import load_breast_cancer
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+import warnings
+
+# Filter out warnings
+warnings.filterwarnings("ignore")
 
 # App configuration
 st.set_page_config(
-    page_title="Data Science Dashboard",
-    page_icon="📊",
+    page_title="Business Analytics Dashboard",
+    page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Sample data loading functions
+# Sample data generation
 @st.cache_data
-def load_sample_data():
-    data = load_breast_cancer()
-    df = pd.DataFrame(data.data, columns=data.feature_names)
-    df['target'] = data.target
+def generate_sales_data():
+    dates = pd.date_range(start="2023-01-01", end="2024-12-31")
+    products = ['Product A', 'Product B', 'Product C', 'Product D']
+    regions = ['North', 'South', 'East', 'West']
+    
+    data = {
+        'Date': np.random.choice(dates, 1000),
+        'Product': np.random.choice(products, 1000),
+        'Region': np.random.choice(regions, 1000),
+        'Sales': np.random.randint(50, 500, 1000),
+        'Profit': np.random.uniform(10, 200, 1000).round(2)
+    }
+    df = pd.DataFrame(data)
+    df['Date'] = pd.to_datetime(df['Date'])
     return df
 
 @st.cache_data
-def generate_drift_data():
-    dates = pd.date_range(end=datetime.today(), periods=100).to_list()
-    values = np.random.normal(0, 1, 100).cumsum() + 10
-    return pd.DataFrame({'date': dates, 'value': values})
+def generate_kpi_data():
+    months = pd.date_range(start="2023-01-01", periods=12, freq='M')
+    return pd.DataFrame({
+        'Month': months,
+        'Revenue': (np.random.normal(100, 20, 12).cumsum() * 1000).astype(int),
+        'Customers': np.random.randint(500, 1500, 12),
+        'Expenses': (np.random.normal(30, 5, 12).cumsum() * 1000).astype(int)
+    })
 
 # Navigation
 def navigation():
-    st.sidebar.title("Data Science Dashboard")
+    st.sidebar.title("Business Dashboard")
     st.sidebar.markdown("---")
     page = st.sidebar.radio(
         "Navigate",
-        ["ETL & Data Visualization", "Model Training", "Data & Model Drift", "Explainable AI (SHAP)"],
+        ["Sales Overview", "Product Analysis", "Regional Performance", "Financial Metrics"],
         label_visibility="collapsed"
     )
     st.sidebar.markdown("---")
     st.sidebar.markdown("### About")
     st.sidebar.info(
-        "Modernistic dashboard for end-to-end data science workflow. "
-        "Includes ETL, modeling, monitoring, and explainability."
+        "Interactive business analytics dashboard for tracking key performance indicators."
     )
     return page
 
-def load_uploaded_file(uploaded_file):
-    """Load either CSV or Excel file based on file extension"""
-    try:
-        if uploaded_file.name.endswith('.csv'):
-            return pd.read_csv(uploaded_file)
-        elif uploaded_file.name.endswith(('.xls', '.xlsx')):
-            try:
-                return pd.read_excel(uploaded_file, engine='openpyxl')
-            except ImportError:
-                st.error("""
-                **Missing dependency**: The 'openpyxl' package is required to read Excel files.
-                
-                Please install it by running:
-                ```
-                pip install openpyxl
-                ```
-                Then restart the app.
-                """)
-                return None
-            except Exception as e:
-                st.error(f"Error reading Excel file: {str(e)}")
-                return None
-        else:
-            st.error("Unsupported file format. Please upload a CSV or Excel file.")
-            return None
-    except Exception as e:
-        st.error(f"Error loading file: {str(e)}")
-        return None
-
-# Page 1: ETL & Data Visualization
-def etl_data_viz():
-    st.title("📥 ETL & Data Visualization")
-    st.markdown("Extract, Transform, Load processes with interactive visualizations")
+# Page 1: Sales Overview
+def sales_overview():
+    st.title("📊 Sales Overview")
+    st.markdown("High-level sales performance metrics and trends")
     
-    with st.expander("Upload Data", expanded=True):
-        uploaded_file = st.file_uploader(
-            "Choose a CSV or Excel file", 
-            type=['csv', 'xls', 'xlsx'],
-            help="Upload your dataset in CSV or Excel format"
-        )
-        
-        if uploaded_file is not None:
-            df = load_uploaded_file(uploaded_file)
-            if df is None:
-                st.stop()  # Stop execution if file loading failed
-            st.success("File successfully loaded!")
-        else:
-            df = load_sample_data()
-            st.info("Using sample breast cancer dataset. Upload your own file to explore your data.")
+    df = generate_sales_data()
+    kpi_df = generate_kpi_data()
     
-    # Only proceed if df exists and is not None
-    if df is None or df.empty:
-        st.warning("No valid data loaded. Please upload a file or use sample data.")
-        st.stop()
-    
-    col1, col2 = st.columns(2)
-    
+    # KPI Cards
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.subheader("Data Preview")
-        st.dataframe(df.head(10), use_container_width=True)
-    
+        st.metric("Total Sales", f"${df['Sales'].sum():,}")
     with col2:
-        st.subheader("Column Statistics")
-        st.dataframe(df.describe(), use_container_width=True)
+        st.metric("Average Profit", f"${df['Profit'].mean():.2f}")
+    with col3:
+        st.metric("Unique Products", df['Product'].nunique())
+    with col4:
+        st.metric("Regions Covered", df['Region'].nunique())
     
     st.markdown("---")
-    st.subheader("Interactive Visualizations")
     
-    viz_type = st.selectbox(
-        "Select Visualization Type",
-        ["Scatter Plot", "Histogram", "Box Plot", "Correlation Heatmap"]
+    # Time period selection
+    col1, col2 = st.columns(2)
+    with col1:
+        start_date = st.date_input("Start Date", 
+                                 value=datetime(2023, 1, 1),
+                                 min_value=datetime(2023, 1, 1),
+                                 max_value=datetime(2024, 12, 31))
+    with col2:
+        end_date = st.date_input("End Date",
+                               value=datetime(2024, 12, 31),
+                               min_value=datetime(2023, 1, 1),
+                               max_value=datetime(2024, 12, 31))
+    
+    # Filter data
+    filtered_df = df[(df['Date'].dt.date >= start_date) & 
+                    (df['Date'].dt.date <= end_date)]
+    
+    st.markdown("---")
+    
+    # Sales trend
+    st.subheader("Sales Trend Over Time")
+    trend_df = filtered_df.groupby(pd.Grouper(key='Date', freq='M'))['Sales'].sum().reset_index()
+    fig = px.line(trend_df, x='Date', y='Sales', 
+                 title="Monthly Sales Trend",
+                 markers=True)
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # Revenue vs Expenses
+    st.subheader("Revenue vs Expenses")
+    fig = px.bar(kpi_df, x='Month', y=['Revenue', 'Expenses'],
+                barmode='group',
+                title="Monthly Financial Performance")
+    st.plotly_chart(fig, use_container_width=True)
+
+# Page 2: Product Analysis
+def product_analysis():
+    st.title("📦 Product Analysis")
+    st.markdown("Performance metrics by product category")
+    
+    df = generate_sales_data()
+    
+    # Product selection
+    selected_products = st.multiselect(
+        "Select Products to Analyze",
+        options=df['Product'].unique(),
+        default=df['Product'].unique()
     )
     
-    if viz_type == "Scatter Plot":
-        col1, col2 = st.columns(2)
-        with col1:
-            x_axis = st.selectbox("X-axis", df.columns)
-        with col2:
-            y_axis = st.selectbox("Y-axis", df.columns)
-        
-        color_by = st.selectbox("Color by", [None] + list(df.select_dtypes(include=['object', 'category', 'int']).columns))
-        
-        fig = px.scatter(df, x=x_axis, y=y_axis, color=color_by, 
-                         hover_data=df.columns, title=f"{y_axis} vs {x_axis}")
-        st.plotly_chart(fig, use_container_width=True)
-    
-    elif viz_type == "Histogram":
-        col1, col2 = st.columns(2)
-        with col1:
-            column = st.selectbox("Select column", df.select_dtypes(include=['number']).columns)
-        with col2:
-            bins = st.slider("Number of bins", 5, 100, 20)
-        
-        fig = px.histogram(df, x=column, nbins=bins, title=f"Distribution of {column}")
-        st.plotly_chart(fig, use_container_width=True)
-    
-    elif viz_type == "Box Plot":
-        col1, col2 = st.columns(2)
-        with col1:
-            column = st.selectbox("Select column", df.select_dtypes(include=['number']).columns)
-        with col2:
-            group_by = st.selectbox("Group by", [None] + list(df.select_dtypes(include=['object', 'category']).columns))
-        
-        fig = px.box(df, y=column, x=group_by, title=f"Box Plot of {column}")
-        st.plotly_chart(fig, use_container_width=True)
-    
-    elif viz_type == "Correlation Heatmap":
-        numeric_df = df.select_dtypes(include=['number'])
-        if len(numeric_df.columns) > 0:
-            fig = px.imshow(numeric_df.corr(), 
-                            text_auto=True, 
-                            aspect="auto",
-                            color_continuous_scale='Viridis',
-                            title="Feature Correlation Heatmap")
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.warning("No numeric columns found for correlation heatmap")
-
-# Page 2: Model Training
-def model_training():
-    st.title("🤖 Model Training")
-    st.markdown("Train and evaluate machine learning models")
-    
-    df = load_sample_data()
-    X = df.drop('target', axis=1)
-    y = df['target']
-    
-    st.subheader("Dataset Information")
-    st.markdown(f"""
-    - **Samples**: {X.shape[0]}
-    - **Features**: {X.shape[1]}
-    - **Target distribution**: {y.value_counts().to_dict()}
-    """)
-    
-    st.markdown("---")
-    st.subheader("Model Configuration")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        test_size = st.slider("Test set size (%)", 10, 40, 20)
-        random_state = st.number_input("Random state", 0, 100, 42)
-    
-    with col2:
-        n_estimators = st.slider("Number of estimators", 10, 200, 100)
-        max_depth = st.slider("Max depth", 2, 20, 5)
-    
-    st.markdown("---")
-    
-    if st.button("Train Model"):
-        with st.spinner("Training model..."):
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=test_size/100, random_state=random_state
-            )
-            
-            model = RandomForestClassifier(
-                n_estimators=n_estimators,
-                max_depth=max_depth,
-                random_state=random_state
-            )
-            model.fit(X_train, y_train)
-            
-            train_score = model.score(X_train, y_train)
-            test_score = model.score(X_test, y_test)
-            
-            st.session_state['model'] = model
-            st.session_state['X_test'] = X_test
-            st.session_state['y_test'] = y_test
-            
-            st.success("Model trained successfully!")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Training Accuracy", f"{train_score:.2%}")
-            with col2:
-                st.metric("Test Accuracy", f"{test_score:.2%}")
-            
-            # Feature importance
-            st.subheader("Feature Importance")
-            importances = model.feature_importances_
-            indices = np.argsort(importances)[::-1]
-            
-            fig, ax = plt.subplots(figsize=(10, 6))
-            ax.set_title("Feature Importances")
-            ax.barh(range(10), importances[indices][:10], align="center")
-            ax.set_yticks(range(10))
-            ax.set_yticklabels(X.columns[indices][:10])
-            ax.invert_yaxis()
-            st.pyplot(fig)
-    
-    if 'model' not in st.session_state:
-        st.warning("Configure your model and click 'Train Model' to get started")
-
-# Page 3: Data & Model Drift
-def data_model_drift():
-    st.title("📉 Data & Model Drift")
-    st.markdown("Monitor data and model performance over time")
-    
-    st.subheader("Data Drift Detection")
-    drift_df = generate_drift_data()
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        window_size = st.slider("Moving average window", 5, 30, 10)
-    with col2:
-        threshold = st.slider("Drift threshold", 0.1, 2.0, 0.5)
-    
-    drift_df['ma'] = drift_df['value'].rolling(window=window_size).mean()
-    drift_df['upper'] = drift_df['ma'] + threshold
-    drift_df['lower'] = drift_df['ma'] - threshold
-    
-    fig = px.line(drift_df, x='date', y=['value', 'ma', 'upper', 'lower'],
-                  title="Data Drift Monitoring", 
-                  labels={'value': 'Metric Value', 'date': 'Date'})
-    
-    st.plotly_chart(fig, use_container_width=True)
-    
-    st.markdown("---")
-    st.subheader("Model Performance Drift")
-    
-    # Simulate performance metrics over time
-    dates = pd.date_range(end=datetime.today(), periods=30).to_list()
-    accuracy = np.clip(np.random.normal(0.85, 0.05, 30).cumsum() / np.arange(1, 31), 0.7, 0.95)
-    precision = np.clip(accuracy - np.random.normal(0.05, 0.01, 30), 0.6, 0.95)
-    recall = np.clip(accuracy + np.random.normal(0.03, 0.01, 30), 0.65, 0.98)
-    
-    perf_df = pd.DataFrame({
-        'date': dates,
-        'accuracy': accuracy,
-        'precision': precision,
-        'recall': recall
-    })
-    
-    metric = st.selectbox("Select metric to monitor", ['accuracy', 'precision', 'recall'])
-    
-    fig = px.line(perf_df, x='date', y=metric,
-                  title=f"Model {metric.capitalize()} Over Time",
-                  markers=True)
-    
-    # Add reference line
-    ref_line = perf_df[metric].mean()
-    fig.add_hline(y=ref_line, line_dash="dash", line_color="red",
-                  annotation_text=f"Average: {ref_line:.2f}",
-                  annotation_position="bottom right")
-    
-    st.plotly_chart(fig, use_container_width=True)
-
-# Page 4: Explainable AI (SHAP)
-def explainable_ai():
-    st.title("🔍 Explainable AI (SHAP)")
-    st.markdown("Model interpretability using SHAP values")
-    
-    if 'model' not in st.session_state:
-        st.warning("Please train a model on the 'Model Training' page first")
+    if not selected_products:
+        st.warning("Please select at least one product")
         return
     
-    model = st.session_state['model']
-    X_test = st.session_state['X_test']
-    y_test = st.session_state['y_test']
+    filtered_df = df[df['Product'].isin(selected_products)]
     
-    st.subheader("Global Feature Importance")
+    col1, col2 = st.columns(2)
     
-    try:
-        # Calculate SHAP values
-        explainer = shap.TreeExplainer(model)
-        shap_values = explainer.shap_values(X_test)
-        
-        # Handle binary/multi-class cases
-        if isinstance(shap_values, list):
-            # For binary classification, use index 1 (positive class)
-            if len(shap_values) == 2:
-                shap_values = shap_values[1]
-                expected_value = explainer.expected_value[1]
-            else:
-                # For multi-class, use first class (can modify as needed)
-                shap_values = shap_values[0]
-                expected_value = explainer.expected_value[0]
-        else:
-            expected_value = explainer.expected_value
-        
-        # Ensure X_test is a DataFrame
-        if not isinstance(X_test, pd.DataFrame):
-            X_test = pd.DataFrame(X_test, columns=[f"Feature_{i}" for i in range(X_test.shape[1])])
-        
-        # Summary plot
-        plt.figure(figsize=(10, 6))
-        shap.summary_plot(shap_values, X_test, plot_type="bar", show=False)
-        st.pyplot(plt.gcf(), clear_figure=True)
-        
-        st.markdown("---")
-        st.subheader("Individual Prediction Explanation")
-        
-        sample_idx = st.slider("Select sample to explain", 0, len(X_test)-1, 0)
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("#### Sample Features")
-            st.dataframe(X_test.iloc[[sample_idx]], use_container_width=True)
-            
-            actual = y_test.iloc[sample_idx]
-            pred = model.predict(X_test.iloc[[sample_idx]])[0]
-            
-            st.metric("Actual", actual)
-            st.metric("Predicted", pred)
-        
-        with col2:
-            st.markdown("#### SHAP Force Plot")
-            plt.figure()
-            
-            # Use the new API format
-            shap.plots.force(
-                expected_value,
-                shap_values[sample_idx, :],
-                X_test.iloc[sample_idx, :],
-                matplotlib=True,
-                show=False
-            )
-            st.pyplot(plt.gcf(), bbox_inches='tight', clear_figure=True)
-            
-    except Exception as e:
-        st.error(f"Error generating SHAP explanations: {str(e)}")
-        st.info("This might occur if the model hasn't been properly trained or if there are feature mismatches.")
+    with col1:
+        st.subheader("Sales by Product")
+        sales_by_product = filtered_df.groupby('Product')['Sales'].sum().reset_index()
+        fig = px.pie(sales_by_product, names='Product', values='Sales',
+                    title="Sales Distribution by Product")
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with col2:
+        st.subheader("Profit Margins")
+        profit_by_product = filtered_df.groupby('Product')['Profit'].mean().reset_index()
+        fig = px.bar(profit_by_product, x='Product', y='Profit',
+                    title="Average Profit by Product")
+        st.plotly_chart(fig, use_container_width=True)
+    
+    st.markdown("---")
+    
+    # Product trend over time
+    st.subheader("Product Performance Over Time")
+    product_trend = filtered_df.groupby(['Product', pd.Grouper(key='Date', freq='M')])['Sales'].sum().reset_index()
+    
+    fig = px.line(product_trend, x='Date', y='Sales', color='Product',
+                 title="Monthly Sales by Product",
+                 markers=True)
+    st.plotly_chart(fig, use_container_width=True)
+
+# Page 3: Regional Performance
+def regional_performance():
+    st.title("🌍 Regional Performance")
+    st.markdown("Sales and profit metrics by geographic region")
+    
+    df = generate_sales_data()
+    
+    # Map visualization (simulated)
+    st.subheader("Regional Sales Distribution")
+    
+    # Create simulated geo data
+    regions = df['Region'].unique()
+    region_coords = {
+        'North': [40.7128, -74.0060],
+        'South': [34.0522, -118.2437],
+        'East': [25.7617, -80.1918],
+        'West': [47.6062, -122.3321]
+    }
+    
+    region_df = pd.DataFrame({
+        'Region': regions,
+        'Sales': df.groupby('Region')['Sales'].sum().values,
+        'Lat': [region_coords[r][0] for r in regions],
+        'Lon': [region_coords[r][1] for r in regions]
+    })
+    
+    fig = px.scatter_geo(region_df, lat='Lat', lon='Lon',
+                        size='Sales',
+                        hover_name='Region',
+                        projection="natural earth",
+                        title="Sales by Region")
+    st.plotly_chart(fig, use_container_width=True)
+    
+    st.markdown("---")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Sales by Region")
+        fig = px.bar(df.groupby('Region')['Sales'].sum().reset_index(),
+                    x='Region', y='Sales',
+                    title="Total Sales by Region")
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with col2:
+        st.subheader("Profit by Region")
+        fig = px.box(df, x='Region', y='Profit',
+                    title="Profit Distribution by Region")
+        st.plotly_chart(fig, use_container_width=True)
+
+# Page 4: Financial Metrics
+def financial_metrics():
+    st.title("💰 Financial Metrics")
+    st.markdown("Key financial indicators and performance")
+    
+    kpi_df = generate_kpi_data()
+    
+    # Financial KPI Cards
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Revenue", f"${kpi_df['Revenue'].sum():,}")
+    with col2:
+        st.metric("Total Expenses", f"${kpi_df['Expenses'].sum():,}")
+    with col3:
+        profit = kpi_df['Revenue'].sum() - kpi_df['Expenses'].sum()
+        st.metric("Net Profit", f"${profit:,}")
+    
+    st.markdown("---")
+    
+    # Revenue vs Expenses trend
+    st.subheader("Revenue vs Expenses Trend")
+    fig = px.line(kpi_df, x='Month', y=['Revenue', 'Expenses'],
+                 title="Monthly Financial Performance",
+                 markers=True)
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # Profit margin calculation
+    kpi_df['Profit'] = kpi_df['Revenue'] - kpi_df['Expenses']
+    kpi_df['Margin'] = (kpi_df['Profit'] / kpi_df['Revenue']) * 100
+    
+    st.subheader("Profit Margin Trend")
+    fig = px.line(kpi_df, x='Month', y='Margin',
+                 title="Monthly Profit Margin (%)",
+                 markers=True)
+    fig.update_yaxes(ticksuffix="%")
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # Customer metrics
+    st.subheader("Customer Acquisition")
+    fig = px.area(kpi_df, x='Month', y='Customers',
+                 title="Monthly Active Customers")
+    st.plotly_chart(fig, use_container_width=True)
 
 # Main app logic
 def main():
     page = navigation()
     
-    if page == "ETL & Data Visualization":
-        etl_data_viz()
-    elif page == "Model Training":
-        model_training()
-    elif page == "Data & Model Drift":
-        data_model_drift()
-    elif page == "Explainable AI (SHAP)":
-        explainable_ai()
+    if page == "Sales Overview":
+        sales_overview()
+    elif page == "Product Analysis":
+        product_analysis()
+    elif page == "Regional Performance":
+        regional_performance()
+    elif page == "Financial Metrics":
+        financial_metrics()
 
 if __name__ == "__main__":
     main()
